@@ -23,6 +23,7 @@ const NavBar = (props) => (
 //styling
 const NavBarStyle = {
     backgroundColor: "#563d7c",
+    boxShadow: "0px 0px 8px 0px gray"
 }
 
 export default NavBar;
