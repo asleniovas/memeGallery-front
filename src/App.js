@@ -29,9 +29,11 @@ class App extends React.Component {
     return (
 
       <main>
+
         <NavBar/>
-        <ProgressBarComponent percentage={this.props.percentage}/>
+        <ProgressBarComponent percentage={this.state.percentage}/>
         <MemeGallery percentage={(percentage) => this.handleFillerState(percentage)}/>
+        
       </main>
 
     )

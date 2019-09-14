@@ -5,7 +5,7 @@ const NavBar = (props) => (
     
     <nav className="navbar fixed-top navbar-dark" style={NavBarStyle}>
         
-        <button type="button" className="btn btn-success">
+        <button type="button" className="btn btn-success" data-toggle="modal" data-target="#exampleModalCenter">
             <i className="fas fa-plus fa-lg"></i> Add Meme
         </button>
 
@@ -23,7 +23,8 @@ const NavBar = (props) => (
 //styling
 const NavBarStyle = {
     backgroundColor: "#563d7c",
-    boxShadow: "0px 0px 8px 0px gray"
+    boxShadow: "0px 0px 8px 0px gray",
+    zIndex: "100"
 }
 
 export default NavBar;
