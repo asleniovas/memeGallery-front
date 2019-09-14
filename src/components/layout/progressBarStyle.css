@@ -1,0 +1,15 @@
+.custom-progress-bar {
+    position: static;
+    height: 4px;
+    width: 100%;
+    border-radius: 0px;
+    background-color: transparent;
+    z-index: 150;
+}
+
+.filler {
+    background: gold;
+    height: 100%;
+    border-radius: inherit;
+    transition: width 0.8s ease-in;
+}

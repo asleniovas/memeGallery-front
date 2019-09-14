@@ -13,18 +13,42 @@ class MemeGallery extends React.Component {
         //state declarations
         this.state = {
 
+            memes: [],
+            newMemeURL: "",
+            modalMeme: "",
+            modalMemeText: "",
         }
     }
 
+    //fetch all Memes when comp mounts
     componentDidMount() {
 
+        this.props.percentage(100)
+
+        axios.get('https://shrouded-journey-16316.herokuapp.com/api/memes')
+            .then(response => {
+
+                console.log(response)
+                this.setState({memes: response.data})
+
+                this.props.percentage(-100)
+
+            })
+            .catch(error => {
+            
+                console.log(error)
+                console.log("Couldn't fetch the memes.")
+
+                this.props.percentage(-100)
+   
+            })
     }
 
     render() {
 
         return (
 
-            <div></div>
+            <div>Hi</div>
         )
     }
 }
