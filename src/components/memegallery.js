@@ -49,6 +49,8 @@ class MemeGallery extends React.Component {
 
         event.preventDefault();
 
+        this.props.percentage(100)
+
         axios.post('https://shrouded-journey-16316.herokuapp.com/api/memes/', 
             
             {memeURL: this.state.newMemeURL},
@@ -74,6 +76,36 @@ class MemeGallery extends React.Component {
             })
     }
 
+    handleMemeDel = (memeId, index) => {
+
+        var alertbox = window.confirm("You Sure?");
+
+        if (alertbox === true) {
+
+            this.props.percentage(100)
+
+            axios.delete('https://shrouded-journey-16316.herokuapp.com/api/memes/' + memeId)
+                .then(response =>{
+
+                    //remove deleted meme from state array
+                    var memesStateArray = [...this.state.memes];
+                    memesStateArray.splice(index, 1)
+
+                    this.setState({memes: memesStateArray});
+
+                    this.props.percentage(-100)
+                })
+                .catch(err => {
+
+                    console.log(err)
+
+                    this.props.percentage(-100)
+                })
+
+        }
+
+    }
+
     //State change handler
     handleStateChange = (event) => {
         this.setState({[event.target.name]: event.target.value})
@@ -89,20 +121,37 @@ class MemeGallery extends React.Component {
             <div className="container mt-3">
             
                 {/*maping through all memes in state and placing images into cards*/}
-                {
-                    memes.length
+                    <div className="row justify-content-end">
+                    {
+                        memes.length
 
-                        ? memes.map((meme, index) =>
+                            ? memes.map((meme, index) =>
 
-                            <div className="card" style={{width: "18rem"}}>
-                                <img src={meme.url} className="card-img-top" alt="meme"/>
-                                <div className="card-body">
-                                    <button className="btn btn-success">Add Text</button>
-                                </div>
-                            </div>)
+                                <div key={index} className="col mb-4">
+                                    <div className="card" style={{width: "18rem"}}>
+                                        <img src={meme.url} className="card-img-top" alt="meme" height="200" style={{objectFit: "cover"}}/>
+                                        <div className="card-body">
+                                            <div className="row align-items-center">
+                                                <div className="col">
+                                                    <button className="btn btn-success" 
+                                                    style={{display: "block", margin: "0 auto"}}>
+                                                        <i className="fas fa-pencil-alt"></i> Add Text
+                                                    </button>
+                                                </div>
+                                                <div className="col">
+                                                    <button className="btn btn-danger" onClick={this.handleMemeDel.bind(this, meme.id, index)} 
+                                                    style={{display: "block", margin: "0 auto"}}>
+                                                        <i className="fas fa-trash-alt"></i> Delete
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>)
                         
-                        : null
-                }
+                            : null
+                    }
+                    </div>
 
                 {/*Modal for meme saving*/}
                 <div className="modal fade" id="exampleModalCenter" tabIndex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
