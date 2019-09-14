@@ -1,5 +1,5 @@
 .custom-progress-bar {
-    position: static;
+    position: fixed;
     height: 4px;
     width: 100%;
     border-radius: 0px;
