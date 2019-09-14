@@ -16,7 +16,8 @@ class MemeGallery extends React.Component {
             memes: [],
             newMemeURL: "",
             modalMeme: "",
-            modalMemeText: "",
+            modalMemeTextBot: "",
+            modalMemeTextTop: ""
         }
     }
 
@@ -76,6 +77,7 @@ class MemeGallery extends React.Component {
             })
     }
 
+    //DELETE meme handler
     handleMemeDel = (memeId, index) => {
 
         var alertbox = window.confirm("You Sure?");
@@ -106,6 +108,13 @@ class MemeGallery extends React.Component {
 
     }
 
+    //change modal meme url in state when adding text to a meme
+    handleMemeCreation = (memeURL) => {
+
+        this.setState({modalMeme: memeURL})
+
+    }
+
     //State change handler
     handleStateChange = (event) => {
         this.setState({[event.target.name]: event.target.value})
@@ -133,8 +142,9 @@ class MemeGallery extends React.Component {
                                         <div className="card-body">
                                             <div className="row align-items-center">
                                                 <div className="col">
-                                                    <button className="btn btn-success" 
-                                                    style={{display: "block", margin: "0 auto"}}>
+                                                    <button className="btn btn-success" onClick={this.handleMemeCreation.bind(this, meme.url)}
+                                                    style={{display: "block", margin: "0 auto"}}
+                                                    data-toggle="modal" data-target="#memeCreationModal">
                                                         <i className="fas fa-pencil-alt"></i> Add Text
                                                     </button>
                                                 </div>
@@ -186,6 +196,22 @@ class MemeGallery extends React.Component {
                         </div>
                     </div>
                 </div>
+
+                {/*Modal for meme creation*/}
+                <div className="modal fade" id="memeCreationModal" tabIndex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                    <div className="modal-dialog modal-dialog-centered" role="document">
+                        <div className="modal-content">
+                            <div className="card">
+                                    <img src={this.state.modalMeme} className="card-img-top" alt="meme" height="350" style={{objectFit: "cover"}}/>
+                                    <div className="card-body">
+                                        <div className="row align-items-center">
+                                        </div>
+                                    </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         )
     }
