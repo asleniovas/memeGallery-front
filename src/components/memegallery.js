@@ -101,7 +101,9 @@ class MemeGallery extends React.Component {
                     var memesStateArray = [...this.state.memes];
                     memesStateArray.splice(index, 1)
 
-                    this.setState({memes: memesStateArray});
+                    this.setState({memes: memesStateArray}, () => {
+                        this.setState({currentMeme: 0})
+                    });
 
                     this.props.percentage(-100)
                 })
@@ -168,14 +170,17 @@ class MemeGallery extends React.Component {
 
         const svg = this.svgRef;
         let svgData = new XMLSerializer().serializeToString(svg);
+
         const canvas = document.createElement("canvas");
         canvas.setAttribute("id", "canvas");
         const svgSize = svg.getBoundingClientRect();
         canvas.width = svgSize.width;
         canvas.height = svgSize.height;
+
         const img = document.createElement("img");
         img.setAttribute("src", "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(svgData))));
         img.onload = function() {
+
           canvas.getContext("2d").drawImage(img, 0, 0);
           const canvasdata = canvas.toDataURL("image/png");
           const a = document.createElement("a");
@@ -183,6 +188,7 @@ class MemeGallery extends React.Component {
           a.href = canvasdata;
           document.body.appendChild(a);
           a.click();
+
         };
       }
 
@@ -194,7 +200,7 @@ class MemeGallery extends React.Component {
         //always keeping 1 meme in state and resizing image in modal
         if (memes.length > 0) {
 
-            const image = memes[0].url;
+            const image = memes[this.state.currentMeme].url;
             const base_image = new Image();
 
             base_image.src = image;
@@ -202,7 +208,6 @@ class MemeGallery extends React.Component {
             var newWidth = 600;
             var newHeight = newWidth / wrh;
 
-           
         }
 
         //meme text style
@@ -296,8 +301,9 @@ class MemeGallery extends React.Component {
                 <div className="modal fade" id="memeCreationModal" tabIndex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
                     <div className="modal-dialog modal-dialog-centered" role="document">
                         <div className="modal-content">
-                            <div className="card" width={newWidth}>
+                            <div className="card">
 
+                                    {/*The Meme*/}
                                     <svg className="card-img-top"
                                             id="svg_ref"
                                             xmlns="http://www.w3.org/2000/svg"
@@ -311,7 +317,6 @@ class MemeGallery extends React.Component {
                                             xlinkHref={this.state.currentImagebase64}
                                             height={newHeight}
                                             width={newWidth}
-                                            style={{objectFit: "cover"}}
 
                                         />
                                         <text
