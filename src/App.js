@@ -10,6 +10,7 @@ class App extends React.Component {
   constructor(props) {
     super(props);
 
+    //initial state for progress bar
     this.state = {
       percentage: 0
     }
@@ -20,6 +21,7 @@ class App extends React.Component {
         
     var currentPercentage = this.state.percentage;
 
+    //add a number to existing percentage to manipulate the filler
     this.setState({ percentage: currentPercentage + percentage })
 
   }

@@ -3,9 +3,7 @@ import React from "react";
 //HTTP request library
 import axios from "axios";
 
-//for easy nested state updates
-import update from 'immutability-helper';
-
+//Meme Gallery component with associated handlings
 class MemeGallery extends React.Component {
     constructor(props) {
         super(props)
@@ -14,9 +12,9 @@ class MemeGallery extends React.Component {
         this.state = {
 
             memes: [],
+            dataLoaded: false,
             currentMeme : 0,
             newMemeURL: "",
-            modalMeme: "",
             modalMemeTextBot: "",
             modalMemeTextTop: "",
             currentImagebase64: null,
@@ -28,16 +26,18 @@ class MemeGallery extends React.Component {
     }
 
     //fetch all Memes when comp mounts
-    componentDidMount() {
+    async componentDidMount() {
 
         this.props.percentage(100)
 
-        axios.get('https://shrouded-journey-16316.herokuapp.com/api/memes')
+        await axios.get('https://shrouded-journey-16316.herokuapp.com/api/memes')
             .then(response => {
 
                 console.log(response)
                 this.setState({memes: response.data} , () => {
-                    this.setState({currentMeme: 0})
+                    this.setState({currentMeme: 0}, () => {
+                        this.setState({dataLoaded: true})
+                    })
                 })
 
                 this.props.percentage(-100)
@@ -70,6 +70,7 @@ class MemeGallery extends React.Component {
                 
                 console.log(response)
 
+                //add new meme to the beginning of gallery
                 this.setState(prevState => ({
                     memes: [response.data[0], ...prevState.memes]
                 }))
@@ -115,13 +116,6 @@ class MemeGallery extends React.Component {
                 })
 
         }
-
-    }
-
-    //change modal meme url in state when adding text to a meme
-    handleMemeCreation = (memeURL) => {
-
-        this.setState({modalMeme: memeURL})
 
     }
 
@@ -181,37 +175,47 @@ class MemeGallery extends React.Component {
         img.setAttribute("src", "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(svgData))));
         img.onload = function() {
 
-          canvas.getContext("2d").drawImage(img, 0, 0);
-          const canvasdata = canvas.toDataURL("image/png");
-          const a = document.createElement("a");
-          a.download = "meme.png";
-          a.href = canvasdata;
-          document.body.appendChild(a);
-          a.click();
+            canvas.getContext("2d").drawImage(img, 0, 0);
+            const canvasdata = canvas.toDataURL("image/png");
+            const a = document.createElement("a");
+            a.download = "meme.png";
+            a.href = canvasdata;
+            document.body.appendChild(a);
+            a.click();
 
         };
-      }
+    }
 
     render() {
 
         const {memes} = this.state;
+        const {dataLoaded} = this.state;
         
         
-        //always keeping 1 meme in state and resizing image in modal
-        if (memes.length > 0) {
+        //resizing image in modal when state changes occur
+        if (dataLoaded === true) {
 
-            const image = memes[this.state.currentMeme].url;
-            const base_image = new Image();
+            var wrh;
+            var newWidth;
+            var newHeight;
+            var image = memes[this.state.currentMeme].url;
+            var base_image = new Image();
+
+
+            base_image.onload = () => {
+
+                wrh = base_image.width / base_image.height;
+                newWidth = 600;
+                newHeight = newWidth / wrh;
+            }
 
             base_image.src = image;
-            var wrh = base_image.width / base_image.height;
-            var newWidth = 600;
-            var newHeight = newWidth / wrh;
 
         }
 
         //meme text style
         const textStyle = {
+
             fontFamily: "Impact",
             fontSize: "50px",
             textTransform: "uppercase",
@@ -219,7 +223,7 @@ class MemeGallery extends React.Component {
             stroke: "#000",
             userSelect: "none"
         }
-
+        
 
         return (
 
@@ -298,10 +302,12 @@ class MemeGallery extends React.Component {
                 </div>
 
                 {/*Modal for meme creation*/}
-                <div className="modal fade" id="memeCreationModal" tabIndex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-                    <div className="modal-dialog modal-dialog-centered" role="document">
-                        <div className="modal-content">
-                            <div className="card">
+                
+                {dataLoaded ? 
+                    <div className="modal fade" id="memeCreationModal" tabIndex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                        <div className="modal-dialog modal-dialog-centered" role="document">
+                            <div className="modal-content">
+                                <div className="card">
 
                                     {/*The Meme*/}
                                     <svg className="card-img-top"
@@ -358,10 +364,12 @@ class MemeGallery extends React.Component {
                                             </button>
                                         </div>
                                     </div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
+                    : null
+                }
 
             </div>
         )
