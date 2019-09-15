@@ -191,7 +191,7 @@ class MemeGallery extends React.Component {
         const {memes} = this.state;
         
         
-
+        //always keeping 1 meme in state and resizing image in modal
         if (memes.length > 0) {
 
             const image = memes[0].url;
@@ -205,6 +205,7 @@ class MemeGallery extends React.Component {
            
         }
 
+        //meme text style
         const textStyle = {
             fontFamily: "Impact",
             fontSize: "50px",
@@ -269,7 +270,10 @@ class MemeGallery extends React.Component {
 
                                     <div className="form-row">
                                         <div className="col">
-                                            <label htmlFor="memeURL">Please Enter a Valid Meme URL Below</label>   
+                                            <label htmlFor="memeURL">
+                                                Please Enter a Valid Meme URL Below (Preferably From Imgur as They Allow CORS) 
+                                                <i className="fas fa-grin-beam-sweat fa-lg ml-2"></i>
+                                            </label>   
                                         </div>
                                     </div>
                         
@@ -292,43 +296,44 @@ class MemeGallery extends React.Component {
                 <div className="modal fade" id="memeCreationModal" tabIndex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
                     <div className="modal-dialog modal-dialog-centered" role="document">
                         <div className="modal-content">
-                            <div className="card">
+                            <div className="card" width={newWidth}>
 
                                     <svg className="card-img-top"
-                                    id="svg_ref"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    xmlnsXlink="http://www.w3.org/1999/xlink"
-                                    width={newWidth}
-                                    height={newHeight}
-                                    ref={el => { this.svgRef = el }}>
-                                    <image
+                                            id="svg_ref"
+                                            xmlns="http://www.w3.org/2000/svg"
+                                            xmlnsXlink="http://www.w3.org/1999/xlink"
+                                            width={newWidth}
+                                            height={newHeight}
+                                            ref={el => { this.svgRef = el }}>
+                                        <image
                                         
-                                        ref={el => { this.imageRef = el }}
-                                        xlinkHref={this.state.currentImagebase64}
-                                        height={newHeight}
-                                        width={newWidth}
-                                        style={{objectFit: "cover"}}
+                                            ref={el => { this.imageRef = el }}
+                                            xlinkHref={this.state.currentImagebase64}
+                                            height={newHeight}
+                                            width={newWidth}
+                                            style={{objectFit: "cover"}}
 
-                                    />
-                                    <text
-                                        style={textStyle}
-                                        x={this.state.topX}
-                                        y={this.state.topY}
-                                        dominantBaseline="middle"
-                                        textAnchor="middle"
-                                    >
-                                        {this.state.modalMemeTextTop}
-                                    </text>
-                                    <text
-                                        style={textStyle}
-                                        dominantBaseline="middle"
-                                        textAnchor="middle"
-                                        x={this.state.bottomX}
-                                        y={this.state.bottomY}
-                                    >
-                                        {this.state.modalMemeTextBot}
-                                    </text>
+                                        />
+                                        <text
+                                            style={textStyle}
+                                            x={this.state.topX}
+                                            y={this.state.topY}
+                                            dominantBaseline="middle"
+                                            textAnchor="middle"
+                                        >
+                                            {this.state.modalMemeTextTop}
+                                        </text>
+                                        <text
+                                            style={textStyle}
+                                            dominantBaseline="middle"
+                                            textAnchor="middle"
+                                            x={this.state.bottomX}
+                                            y={this.state.bottomY}
+                                        >
+                                            {this.state.modalMemeTextBot}
+                                        </text>
                                     </svg>
+
                                     <div className="card-body">
                                         <div className="form-row mb-1">
                                             <label>Top Text:</label> 
