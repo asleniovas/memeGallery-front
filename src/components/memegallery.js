@@ -14,10 +14,16 @@ class MemeGallery extends React.Component {
         this.state = {
 
             memes: [],
+            currentMeme : 0,
             newMemeURL: "",
             modalMeme: "",
             modalMemeTextBot: "",
-            modalMemeTextTop: ""
+            modalMemeTextTop: "",
+            currentImagebase64: null,
+            topY: "10%",
+            topX: "50%",
+            bottomX: "50%",
+            bottomY: "90%"
         }
     }
 
@@ -30,7 +36,9 @@ class MemeGallery extends React.Component {
             .then(response => {
 
                 console.log(response)
-                this.setState({memes: response.data})
+                this.setState({memes: response.data} , () => {
+                    this.setState({currentMeme: 0})
+                })
 
                 this.props.percentage(-100)
 
@@ -63,7 +71,7 @@ class MemeGallery extends React.Component {
                 console.log(response)
 
                 this.setState(prevState => ({
-                    memes: [...prevState.memes, response.data[0] ]
+                    memes: [response.data[0], ...prevState.memes]
                 }))
 
                 this.props.percentage(-100)
@@ -118,11 +126,94 @@ class MemeGallery extends React.Component {
     //State change handler
     handleStateChange = (event) => {
         this.setState({[event.target.name]: event.target.value})
-    }    
+    }
+
+    //onClick handler that loads the clicked meme on to a canvas and sets base64 state
+    openImage = (memeURL, index) => {
+
+        this.setState({currentMeme: index}, () => {
+            
+            const base_image = new Image();
+            base_image.crossOrigin = "anonymous";
+            base_image.onload = () => {
+
+                const base64 = this.getBase64Image(base_image);
+                this.setState({currentImagebase64: base64});
+
+            }
+
+            base_image.src = memeURL;
+            
+
+        })
+        
+
+    }
+
+    //handler that draws the image on the canvas and returns a base64 URL
+    getBase64Image(img) {
+
+        var canvas = document.createElement("canvas");
+        canvas.width = img.width;
+        canvas.height = img.height;
+        var ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0);
+
+        var dataURL = canvas.toDataURL("image/png");
+        return dataURL;
+    }
+
+    //Meme conversion and download
+    convertSvgToImage = () => {
+
+        const svg = this.svgRef;
+        let svgData = new XMLSerializer().serializeToString(svg);
+        const canvas = document.createElement("canvas");
+        canvas.setAttribute("id", "canvas");
+        const svgSize = svg.getBoundingClientRect();
+        canvas.width = svgSize.width;
+        canvas.height = svgSize.height;
+        const img = document.createElement("img");
+        img.setAttribute("src", "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(svgData))));
+        img.onload = function() {
+          canvas.getContext("2d").drawImage(img, 0, 0);
+          const canvasdata = canvas.toDataURL("image/png");
+          const a = document.createElement("a");
+          a.download = "meme.png";
+          a.href = canvasdata;
+          document.body.appendChild(a);
+          a.click();
+        };
+      }
 
     render() {
 
         const {memes} = this.state;
+        
+        
+
+        if (memes.length > 0) {
+
+            const image = memes[0].url;
+            const base_image = new Image();
+
+            base_image.src = image;
+            var wrh = base_image.width / base_image.height;
+            var newWidth = 600;
+            var newHeight = newWidth / wrh;
+
+           
+        }
+
+        const textStyle = {
+            fontFamily: "Impact",
+            fontSize: "50px",
+            textTransform: "uppercase",
+            fill: "#FFF",
+            stroke: "#000",
+            userSelect: "none"
+        }
+
 
         return (
 
@@ -142,7 +233,7 @@ class MemeGallery extends React.Component {
                                         <div className="card-body">
                                             <div className="row align-items-center">
                                                 <div className="col">
-                                                    <button className="btn btn-success" onClick={this.handleMemeCreation.bind(this, meme.url)}
+                                                    <button className="btn btn-success" onClick={this.openImage.bind(this, meme.url, index)}
                                                     style={{display: "block", margin: "0 auto"}}
                                                     data-toggle="modal" data-target="#memeCreationModal">
                                                         <i className="fas fa-pencil-alt"></i> Add Text
@@ -202,9 +293,59 @@ class MemeGallery extends React.Component {
                     <div className="modal-dialog modal-dialog-centered" role="document">
                         <div className="modal-content">
                             <div className="card">
-                                    <img src={this.state.modalMeme} className="card-img-top" alt="meme" height="350" style={{objectFit: "cover"}}/>
+
+                                    <svg className="card-img-top"
+                                    id="svg_ref"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    xmlnsXlink="http://www.w3.org/1999/xlink"
+                                    width={newWidth}
+                                    height={newHeight}
+                                    ref={el => { this.svgRef = el }}>
+                                    <image
+                                        
+                                        ref={el => { this.imageRef = el }}
+                                        xlinkHref={this.state.currentImagebase64}
+                                        height={newHeight}
+                                        width={newWidth}
+                                        style={{objectFit: "cover"}}
+
+                                    />
+                                    <text
+                                        style={textStyle}
+                                        x={this.state.topX}
+                                        y={this.state.topY}
+                                        dominantBaseline="middle"
+                                        textAnchor="middle"
+                                    >
+                                        {this.state.modalMemeTextTop}
+                                    </text>
+                                    <text
+                                        style={textStyle}
+                                        dominantBaseline="middle"
+                                        textAnchor="middle"
+                                        x={this.state.bottomX}
+                                        y={this.state.bottomY}
+                                    >
+                                        {this.state.modalMemeTextBot}
+                                    </text>
+                                    </svg>
                                     <div className="card-body">
-                                        <div className="row align-items-center">
+                                        <div className="form-row mb-1">
+                                            <label>Top Text:</label> 
+                                        </div>
+                                        <div className="form-row mb-3">
+                                            <input type="text" name="modalMemeTextTop" className="form-control" onChange={this.handleStateChange}></input>
+                                        </div>
+                                        <div className="form-row mb-1">
+                                            <label>Bottom Text:</label>
+                                        </div>
+                                        <div className="form-row mb-3">
+                                            <input type="text" name="modalMemeTextBot" className="form-control" onChange={this.handleStateChange}></input>
+                                        </div>
+                                        <div className="form-row">
+                                            <button onClick={() => this.convertSvgToImage()} className="btn btn-success"><i className="fas fa-cloud-download-alt mr-2"></i>
+                                                Download Meme!
+                                            </button>
                                         </div>
                                     </div>
                             </div>
