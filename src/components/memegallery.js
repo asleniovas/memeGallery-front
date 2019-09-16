@@ -177,7 +177,7 @@ class MemeGallery extends React.Component {
         return dataURL;
     }
 
-    //Meme conversion and download
+    //Meme conversion and download to png
     convertSvgToImage = () => {
 
         const svg = this.svgRef;
