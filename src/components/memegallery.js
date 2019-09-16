@@ -3,6 +3,7 @@ import React from "react";
 //HTTP request library
 import axios from "axios";
 
+//meme modal width
 const width = 600;
 
 //Meme Gallery component with associated handlings
@@ -41,14 +42,14 @@ class MemeGallery extends React.Component {
                 this.setState({memes: response.data} , () => {
                     this.setState({currentMeme: 0}, () => {
 
-                        var memes = this.state.memes
+                        //set initial size of initial meme in modal
                         this.image.onload = () => {
                             this.setState({
-                              ratio: this.img.naturalWidth / this.img.naturalHeight  
+                              ratio: this.image.naturalWidth / this.image.naturalHeight  
                             });
                         };
 
-                        this.image.src = memes[this.state.currentImage].url;
+                        this.image.src = this.state.memes[this.state.currentMeme].url;
                     })
                 })
 
@@ -63,14 +64,6 @@ class MemeGallery extends React.Component {
                 this.props.percentage(-100)
    
             })
-    }
-
-    componentDidUpdate(prevProps, prevState) {
-
-        var memes = this.state.memes
-        if (this.state.currentImage !== prevState.currentImage) {
-          this.image.src = memes[this.state.currentImage].url;
-        }
     }
 
     //POST request for new meme URL storage
@@ -122,6 +115,8 @@ class MemeGallery extends React.Component {
                     var memesStateArray = [...this.state.memes];
                     memesStateArray.splice(index, 1)
 
+                    //set new memes state and assign 1st in arr as current meme to avoid DELETE errors ->
+                    //if a current meme is deleted
                     this.setState({memes: memesStateArray}, () => {
                         this.setState({currentMeme: 0})
                     });
@@ -153,11 +148,14 @@ class MemeGallery extends React.Component {
             base_image.crossOrigin = "anonymous";
             base_image.onload = () => {
 
-                const base64 = this.getBase64Image(base_image);
-                this.setState({currentImagebase64: base64});
+                //change aspect ratio and set state to fit meme into modal
+                this.setState({ratio: base_image.naturalWidth / base_image.naturalHeight}, () => {
 
+                    const base64 = this.getBase64Image(base_image);
+                    this.setState({currentImagebase64: base64});
+
+                });
             }
-
             base_image.src = memeURL;
             
 
@@ -210,28 +208,6 @@ class MemeGallery extends React.Component {
 
         const {memes} = this.state;
         const {ratio} = this.state;
-        
-        
-        //resizing image in modal when state changes occur
-        /*if (dataLoaded === true) {
-
-            var wrh;
-            var newWidth;
-            var newHeight;
-            var image = memes[this.state.currentMeme].url;
-            var base_image = new Image();
-
-
-            base_image.onload = () => {
-
-                wrh = base_image.width / base_image.height;
-                newWidth = 600;
-                newHeight = newWidth / wrh;
-            }
-
-            base_image.src = image;
-
-        }*/
 
         //meme text style
         const textStyle = {
