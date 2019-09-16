@@ -22,8 +22,8 @@ class MemeGallery extends React.Component {
             modalMemeTextTop: "",
             currentImagebase64: null,
             topY: "10%",
-            topX: "50%",
-            bottomX: "50%",
+            topX: "46%",
+            bottomX: "46%",
             bottomY: "90%"
         }
 
