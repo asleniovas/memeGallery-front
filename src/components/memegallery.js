@@ -4,7 +4,7 @@ import React from "react";
 import axios from "axios";
 
 //meme modal width
-const width = 600;
+const width = 550;
 
 //Meme Gallery component with associated handlings
 class MemeGallery extends React.Component {
