@@ -3,6 +3,8 @@ import React from "react";
 //HTTP request library
 import axios from "axios";
 
+const width = 600;
+
 //Meme Gallery component with associated handlings
 class MemeGallery extends React.Component {
     constructor(props) {
@@ -12,8 +14,8 @@ class MemeGallery extends React.Component {
         this.state = {
 
             memes: [],
-            dataLoaded: false,
             currentMeme : 0,
+            ratio: undefined,
             newMemeURL: "",
             modalMemeTextBot: "",
             modalMemeTextTop: "",
@@ -23,6 +25,8 @@ class MemeGallery extends React.Component {
             bottomX: "50%",
             bottomY: "90%"
         }
+
+        this.image = new Image();
     }
 
     //fetch all Memes when comp mounts
@@ -36,7 +40,15 @@ class MemeGallery extends React.Component {
                 console.log(response)
                 this.setState({memes: response.data} , () => {
                     this.setState({currentMeme: 0}, () => {
-                        this.setState({dataLoaded: true})
+
+                        var memes = this.state.memes
+                        this.image.onload = () => {
+                            this.setState({
+                              ratio: this.img.naturalWidth / this.img.naturalHeight  
+                            });
+                        };
+
+                        this.image.src = memes[this.state.currentImage].url;
                     })
                 })
 
@@ -51,6 +63,14 @@ class MemeGallery extends React.Component {
                 this.props.percentage(-100)
    
             })
+    }
+
+    componentDidUpdate(prevProps, prevState) {
+
+        var memes = this.state.memes
+        if (this.state.currentImage !== prevState.currentImage) {
+          this.image.src = memes[this.state.currentImage].url;
+        }
     }
 
     //POST request for new meme URL storage
@@ -189,11 +209,11 @@ class MemeGallery extends React.Component {
     render() {
 
         const {memes} = this.state;
-        const {dataLoaded} = this.state;
+        const {ratio} = this.state;
         
         
         //resizing image in modal when state changes occur
-        if (dataLoaded === true) {
+        /*if (dataLoaded === true) {
 
             var wrh;
             var newWidth;
@@ -211,7 +231,7 @@ class MemeGallery extends React.Component {
 
             base_image.src = image;
 
-        }
+        }*/
 
         //meme text style
         const textStyle = {
@@ -301,28 +321,27 @@ class MemeGallery extends React.Component {
                     </div>
                 </div>
 
-                {/*Modal for meme creation*/}
-                
-                {dataLoaded ? 
+                {/*Modal for meme creation*/} 
                     <div className="modal fade" id="memeCreationModal" tabIndex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
                         <div className="modal-dialog modal-dialog-centered" role="document">
                             <div className="modal-content">
                                 <div className="card">
 
                                     {/*The Meme*/}
+                                    {ratio &&
                                     <svg className="card-img-top"
                                             id="svg_ref"
                                             xmlns="http://www.w3.org/2000/svg"
                                             xmlnsXlink="http://www.w3.org/1999/xlink"
-                                            width={newWidth}
-                                            height={newHeight}
+                                            width={width}
+                                            height={width/ratio}
                                             ref={el => { this.svgRef = el }}>
                                         <image
                                         
                                             ref={el => { this.imageRef = el }}
                                             xlinkHref={this.state.currentImagebase64}
-                                            height={newHeight}
-                                            width={newWidth}
+                                            height={width/ratio}
+                                            width={width}
 
                                         />
                                         <text
@@ -344,7 +363,7 @@ class MemeGallery extends React.Component {
                                             {this.state.modalMemeTextBot}
                                         </text>
                                     </svg>
-
+                                    }
                                     <div className="card-body">
                                         <div className="form-row mb-1">
                                             <label>Top Text:</label> 
@@ -368,8 +387,6 @@ class MemeGallery extends React.Component {
                             </div>
                         </div>
                     </div>
-                    : null
-                }
 
             </div>
         )
